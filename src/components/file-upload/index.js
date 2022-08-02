@@ -113,13 +113,13 @@ const FileUpload = ({
                       alt={`File preview ${i}`}
                     />
                   )}
-                  <div isImageFile={isImgFile}>
+                  <FileMetaData isImageFile={isImgFile}>
                     <span>{file.name}</span>
                     <aside>
                       <span>{convertBytesToKB(file.size)}</span>
                       <FaTrash onClick={() => removeFile(fileName)} />
                     </aside>
-                  </div>
+                  </FileMetaData>
                 </div>
               </PreviewContainer >
             )

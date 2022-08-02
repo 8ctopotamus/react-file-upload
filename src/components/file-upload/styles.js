@@ -84,8 +84,7 @@ export const UploadFileBtn = styled.button`
     transition: width 250ms ease-in-out;
   }
 
-  i {
-    font-size: 22px;
+  svg {
     margin-right: 5px;
     border-right: 2px solid;
     position: absolute;
@@ -148,7 +147,7 @@ export const PreviewList = styled.section`
 `
 
 export const FileMetaData = styled.div`
-  display: ${(props) => (props.isImageFile ? "none" : "flex")};
+  display: ${(props) => (props.isImgFile ? "none" : "flex")};
   flex-direction: column;
   position: absolute;
   top: 0;
