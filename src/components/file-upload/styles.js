@@ -9,7 +9,7 @@ export const FileUploadContainer = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: white;
+  background-color: ${({ isDragging }) => isDragging ? 'lightgrey' : 'white'};
 `
 
 export const FormField = styled.input`

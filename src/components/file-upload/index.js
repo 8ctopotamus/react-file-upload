@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FaTrash, FaUpload } from 'react-icons/fa'
 import {
   FileUploadContainer,
@@ -33,6 +33,7 @@ const FileUpload = ({
       "file2.png": File
     }
   */}
+  const [isDragging, setIsDragging] = useState(false)
   const [files, setFiles] = useState({}) 
 
   const fileInputRef = useRef()
@@ -78,7 +79,7 @@ const FileUpload = ({
 
   return (
     <>
-      <FileUploadContainer>
+      <FileUploadContainer isDragging={isDragging}>
         <InputLabel>{label}</InputLabel>
         <DragDropText>Drag and drop your files anywhere or</DragDropText>
         <UploadFileBtn  
@@ -94,6 +95,10 @@ const FileUpload = ({
           title=""
           value=""
           onChange={handleNewFileUpload}
+          onDragEnter={() => setIsDragging(true)}
+          onDragEnd={() => setIsDragging(false)}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={() => setIsDragging(false)}
           multiple={multiple}
           {...props}
         />
