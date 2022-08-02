@@ -1,4 +1,18 @@
 import { useState, useRef } from 'react'
+import { FaTrash, FaUpload } from 'react-icons/fa'
+import {
+  FileUploadContainer,
+  FormField,
+  DragDropText,
+  UploadFileBtn,
+  FilePreviewContainer,
+  ImagePreview,
+  PreviewContainer,
+  PreviewList,
+  FileMetaData,
+  RemoveFileIcon,
+  InputLabel
+} from "./styles"
 
 const DEFAULT_MAX_FILE_SIZE_IN_BYTES = 500000
 const KILO_BYTES_PER_BYTE = 1000
@@ -8,7 +22,7 @@ const convertBytesToKB = bytes => Math.round(bytes / KILO_BYTES_PER_BYTE)
 const FileUpload = ({
   label,
   maxFileSizeInBytes = DEFAULT_MAX_FILE_SIZE_IN_BYTES,
-  updateFilesCb,
+  updateFilesCb = files => console.log(files),
   multiple = true,
   ...props
 }) => {
@@ -23,43 +37,95 @@ const FileUpload = ({
 
   const fileInputRef = useRef()
 
+  const handleUploadBtnClick = () => {
+    fileInputRef.current.click()
+  }
+
+  const handleNewFileUpload = e => {
+    const { files: newFiles } = e.target
+    if (newFiles.length) {
+      const updatedFiles = addNewFiles(newFiles)
+      setFiles(updatedFiles)
+      callUpdateFilesCb(updatedFiles)
+    }
+  }
+
+  const addNewFiles = newFiles => {
+    for (const file of newFiles) {
+      if (file.size <= maxFileSizeInBytes) {
+        if (!multiple) {
+          return { file }
+        }
+        files[file.name] = file
+      }
+    }
+    return { ...files }
+  }
+
+  const callUpdateFilesCb = files => {
+    const filesArray = convertNestedObjectToArray(files)
+    updateFilesCb(filesArray)
+  }
+
+  const convertNestedObjectToArray = nestedObj => Object.keys(nestedObj).map(key => nestedObj[key])
+
+  const removeFile = fileName => {
+    delete files[fileName]
+    const updatedFiles = { ...files }
+    setFiles(updatedFiles)
+    callUpdateFilesCb(updatedFiles)
+  }
+
   return (
     <>
-      <div>
-        <label>{label}</label>
-        <p>Drag and drop your files anywhere or</p>
-        <button type="button">
+      <FileUploadContainer>
+        <InputLabel>{label}</InputLabel>
+        <DragDropText>Drag and drop your files anywhere or</DragDropText>
+        <UploadFileBtn  
+          onClick={handleUploadBtnClick}
+          type="button"
+        >
+          <FaUpload />
           <span>Upload File{multiple && 's'}</span>
-        </button>
-        <input
+        </UploadFileBtn >
+        <FormField
           type="file"
           ref={fileInputRef}
           title=""
           value=""
+          onChange={handleNewFileUpload}
+          multiple={multiple}
           {...props}
         />
-      </div>
-      <div>
+      </FileUploadContainer>
+      <FilePreviewContainer>
         <span>To Upload</span>
-        <section>
+        <PreviewList>
           {Object.keys(files).map((fileName, i) => {
             const file = files[fileName]
             const isImgFile = file.type.split('/')[0] === 'image'
             return (
-              <section key={fileName}>
+              <PreviewContainer key={fileName}>
                 <div>
                   {isImgFile && (
-                    <img 
+                    <ImagePreview 
                       src={URL.createObjectURL(file)}
                       alt={`File preview ${i}`}
                     />
                   )}
+                  <div isImageFile={isImgFile}>
+                    <span>{file.name}</span>
+                    <aside>
+                      <span>{convertBytesToKB(file.size)}</span>
+                      <FaTrash onClick={() => removeFile(fileName)} />
+                    </aside>
+                  </div>
                 </div>
-              </section>
+              </PreviewContainer >
             )
           })}
-        </section>
-      </div>
+        </PreviewList>
+      </FilePreviewContainer>
     </>
   )
 }
